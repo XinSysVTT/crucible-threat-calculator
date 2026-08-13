@@ -1,0 +1,18 @@
+{
+  "CRUCIBLE_THREAT": {
+    "DIFFICULTY": {
+      "Trivial": "Trywialny",
+      "Easy": "Łatwy",
+      "Moderate": "Umiarkowany",
+      "Hard": "Ciężki",
+      "Deadly": "Zabójczy"
+    },
+    "Party": "Drużyna {threat}",
+    "Adversary": "Przeciwnicy {threat}",
+    "Tooltip": "Poziom zagrożenia ze strony przeciwników w porównaniu z poziomem zagrożenia ze strony drużyny (bohaterowie + sojusznicy). Mistrzowie gry mogą kliknąć ocenę, aby dostosować poziom zagrożenia ze strony przeciwników.",
+    "NoPartyWarning": "Nie wykryto zagrożenia ze strony drużyny — najpierw dodaj bohaterów lub sojuszników do tej potyczki.",
+    "NoAdversariesWarning": "W tej potyczce nie ma wrogich przeciwników, których skalę należałoby dostosować.",
+    "AlreadyAtTarget": "Przeciwnicy są już wystarczająco blisko tego poziomu trudności.",
+    "AppliedNotify": "Przeciwnicy zostali dostosowani (ranga i poziom) tak, aby pasowali do spotkania {band}."
+  }
+}
