@@ -157,8 +157,11 @@ function refreshAllTrackers() {
  * Scale hostile Adversary actors up or down so the encounter's Adversary/Party threat ratio lands within
  * the chosen difficulty band. Each Adversary is scaled proportionally to its own current threat. For each
  * one, every rank (Minion/Normal/Elite/Boss) is paired with the Level that best hits that Adversary's
- * target threat at that rank, and the (rank, level) combination with the smallest threat error wins, with
- * ties broken toward the fewest rank/level changes from where the Adversary already is. This keeps a Boss
+ * target threat at that rank, and the (rank, level) combination with the smallest *normalized* threat
+ * error (error relative to that rank's own scaling granularity) wins, with ties broken toward the fewest
+ * rank/level changes from where the Adversary already is. Normalizing keeps the comparison fair across
+ * ranks - otherwise a fine-grained rank like Minion could always land closer to the target in raw threat
+ * points than a coarse rank like Boss, even when both fit their own grid equally well. This keeps a Boss
  * relatively tougher than its Minions, favors nudging Level (fine-grained) over Rank (coarse, only four
  * steps) when both fit similarly well, and avoids moving Level or Rank at all when the current values are
  * already the best fit.
@@ -211,9 +214,14 @@ async function applyDifficulty(bandId, combat) {
       const error = Math.abs((level * scaling) - targetThreat);
       const rankSteps = Math.abs(rankIds.indexOf(rankId) - rankIds.indexOf(currentRank));
       const levelSteps = Math.abs(level - currentLevel);
-      // Threat error dominates the comparison; rank/level steps only break near-ties, and rank changes
-      // (coarse, only 4 steps) are weighted heavier than level changes (fine-grained) when both fit equally.
-      const cost = (Math.round(error * 100) * 1000) + (rankSteps * 10) + levelSteps;
+      // Normalize error by this rank's own scaling before comparing across ranks. Raw threat error is
+      // always <= scaling/2 (by construction of rounding to the nearest level), which means a fine-grained
+      // rank (small scaling) can always land closer to the target in absolute terms than a coarse rank
+      // (large scaling), even when both are an equally good fit for their own grid. Dividing by scaling
+      // puts every rank's fit quality on the same 0-0.5 scale so that comparison is fair, letting the
+      // rank/level-step tie-break actually apply instead of being swamped by that granularity bias.
+      const normalizedError = error / scaling;
+      const cost = (Math.round(normalizedError * 1000) * 100) + (rankSteps * 25) + levelSteps;
       if (!best || (cost < best.cost)) best = {rankId, level, cost};
     }
 
